@@ -30,9 +30,16 @@ export default function Colors(props) {
   const [buttonText, setButtonText] = useState("Get random color");
   const [currentColor, setCurrentColor] = useState("b22222");
   const [colorHistory, setColorHistory] = useState([]);
+  const [customColor, setCustomColor] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleOnClick = async () => {
     const newColor = await getRandomColorFromApi();
+    if (!newColor.length) {
+      alert("FETCHED COLOR VALUE IS EMPTY");
+      return;
+    }
+
     setCurrentColor(newColor);
     if (!colorHistory.includes(currentColor)) {
       setColorHistory([currentColor, ...colorHistory]);
@@ -43,6 +50,26 @@ export default function Colors(props) {
     let colors = [...colorHistory];
     move(colors, position, newPosition);
     setColorHistory(colors);
+  };
+
+  const validateInput = (input) => {
+    const re = new RegExp("^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
+    return re.test(input);
+  };
+
+  const handleOnKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (!validateInput(customColor)) {
+        setErrorMessage("Invalid color value");
+        return;
+      }
+
+      if (!colorHistory.includes(currentColor)) {
+        setColorHistory([currentColor, ...colorHistory]);
+      }
+      setCurrentColor(customColor);
+      setErrorMessage("");
+    }
   };
 
   return (
@@ -57,7 +84,7 @@ export default function Colors(props) {
 
       {colorHistory.map((color, index) => (
         <ColorRow key={index}>
-          <ColorItem value={color} bold={color === "currentColor"} />
+          <ColorItem value={color} bold={color === currentColor} />
           {index !== 0 && (
             <Button
               value="▲"
@@ -72,6 +99,15 @@ export default function Colors(props) {
           )}
         </ColorRow>
       ))}
+
+      <Input
+        placeholder="Add custom color"
+        onChange={(event) => {
+          setCustomColor(event.target.value);
+        }}
+        onKeyDown={handleOnKeyDown}
+      />
+      {errorMessage && <div>{errorMessage}</div>}
     </Fragment>
   );
 }
