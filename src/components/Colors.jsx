@@ -2,6 +2,16 @@ import { Fragment, useState } from "react";
 import axios from "axios";
 import Button from "components/Button";
 import Input from "components/Input";
+import ColorItem from "components/ColorItem";
+import styled from "styled-components";
+
+const move = (array, oldIndex, newIndex) => {
+  if (newIndex >= array.length) {
+    newIndex = array.length - 1;
+  }
+  array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+  return array;
+};
 
 const getRandomColorFromApi = async () => {
   const response = await axios.get(
@@ -14,6 +24,8 @@ const getRandomColorFromApi = async () => {
   return null;
 };
 
+const ColorRow = styled.div``;
+
 export default function Colors(props) {
   const [buttonText, setButtonText] = useState("Get random color");
   const [currentColor, setCurrentColor] = useState("b22222");
@@ -22,23 +34,44 @@ export default function Colors(props) {
   const handleOnClick = async () => {
     const newColor = await getRandomColorFromApi();
     setCurrentColor(newColor);
-    setColorHistory([currentColor, ...colorHistory]);
+    if (!colorHistory.includes(currentColor)) {
+      setColorHistory([currentColor, ...colorHistory]);
+    }
+  };
+
+  const handleColorMove = (position, newPosition) => {
+    let colors = [...colorHistory];
+    move(colors, position, newPosition);
+    setColorHistory(colors);
   };
 
   return (
     <Fragment>
       <Button value={buttonText} color={currentColor} onClick={handleOnClick} />
-
-      {colorHistory.map((color, ix) => (
-        <div key={ix}>#{color}</div>
-      ))}
-
       <Input
         value={buttonText}
         onChange={(event) => {
           setButtonText(event.target.value);
         }}
       />
+
+      {colorHistory.map((color, index) => (
+        <ColorRow key={index}>
+          <ColorItem value={color} bold={color === "currentColor"} />
+          {index !== 0 && (
+            <Button
+              value="▲"
+              onClick={() => handleColorMove(index, index - 1)}
+            />
+          )}
+          {index !== colorHistory.length - 1 && (
+            <Button
+              value="▼"
+              onClick={() => handleColorMove(index, index + 1)}
+            />
+          )}
+        </ColorRow>
+      ))}
     </Fragment>
   );
 }

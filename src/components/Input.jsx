@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const StyledInput = styled.input`
-  border-radius: 3px;
+  border-radius: 1px;
   height: 32px;
   width: 200px;
   border: none;

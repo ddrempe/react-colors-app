@@ -13,6 +13,7 @@ const StyledButton = styled.input`
   &:hover {
     cursor: pointer;
   }
+  margin: 4px;
 `;
 
 export default function Button(props) {
