@@ -53,14 +53,16 @@ export default function Colors(props) {
   };
 
   const validateInput = (input) => {
-    const re = new RegExp("^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
+    const re = new RegExp("^([a-f0-9]{6})$");
     return re.test(input);
   };
 
   const handleOnKeyDown = (event) => {
     if (event.key === "Enter") {
       if (!validateInput(customColor)) {
-        setErrorMessage("Invalid color value");
+        setErrorMessage(
+          "Invalid color value. Value should be 6 characters long and can only include lowercase letters (a-f) and numbers."
+        );
         return;
       }
 
